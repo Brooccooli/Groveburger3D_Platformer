@@ -270,7 +270,7 @@ function love.draw()
             local Z = getNoise(X, Y)
             if Z < noiseThreshold then
                 -- Lava
-                love.graphics.setColor(1, 1, 1)
+                love.graphics.setColor(1 - (1 - Z), 1 - (1 - Z), 1 - (1 - Z))
                 lava:setTranslation((X * 2) + noiseSpawn.x, (Y * 2) + noiseSpawn.y, (Z * floorHeightDifference))
                 lava:draw()
                 love.graphics.setColor(0.5, 0.5, 0.5)
@@ -281,7 +281,7 @@ function love.draw()
 
                 -- lighting
                 local lightmag = Vector.magnitude(playerPos.x - current.x, playerPos.y - current.y, 0)
-                local light = 0.5 + (0.5 - (math.max(0, math.min(lightmag * 0.1, 0.5))))
+                local light = 0.5 + (0.5 - (math.max(0, math.min(lightmag * 0.1, 0.5)))) + (1 - Z)
                 love.graphics.setColor(light, light, light)
                 ground:draw()
                 love.graphics.setColor(0.5, 0.5, 0.5)
