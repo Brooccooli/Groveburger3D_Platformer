@@ -41,6 +41,7 @@ function gameSetup()
     noiseSpawn = { x = -100, y = -100 }
     noiseThreshold = 0.9
     goalIndex = love.math.random(1, 100 * 100)
+    timer = 0
     local foundSpanw = false
     while (true) do
         for X = 100, 1, -1 do
@@ -259,8 +260,10 @@ function love.draw()
         for Y = 100, 1, -1 do
             local Z = getNoise(X, Y)
             if Z < noiseThreshold then
+                love.graphics.setColor(1, 1, 1)
                 lava:setTranslation((X * 2) + noiseSpawn.x, (Y * 2) + noiseSpawn.y, (Z * floorHeightDifference))
                 lava:draw()
+                love.graphics.setColor(0.5, 0.5, 0.5)
             else
                 ground:setTranslation((X * 2) + noiseSpawn.x, (Y * 2) + noiseSpawn.y, (Z * floorHeightDifference))
                 ground:draw()
@@ -280,7 +283,11 @@ function love.draw()
             end
         end
     end
+    
+    -- goal
+    love.graphics.setColor(0.6, 1, 0.6)
     crate:draw()
+    love.graphics.setColor(0.5, 0.5, 0.5)
 
     --goal:draw()
 
@@ -294,6 +301,12 @@ function love.draw()
     if not foundGoal then
         goalIndex = love.math.random(1, 100 * 100)
     end
+
+    -- UI
+    local screenX, screenY = love.window.getMode()
+    love.graphics.setColor(0, 1, 0)
+    love.graphics.print("Survival Time: " .. timer, screenX / 2, 10)
+    love.graphics.setColor(0.5, 0.5, 0.5)
 
     DebugWrite(debugStr)
 end
