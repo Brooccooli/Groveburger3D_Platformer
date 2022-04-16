@@ -23,10 +23,16 @@ local cameraZoom = 1
 local gravity = 0.5
 local zVel = 0
 
+-- Settings
+local fullscreen = false
+local oldFKey = love.keyboard.isDown('f')
+
 -- Debug
 local debugStr = ""
 
 function love.load()
+    love.window.setMode(800, 600, {depth=1, minwidth=800, minheight=600, resizable=true})
+
     love.mouse.setRelativeMode(true)
     love.mouse.setGrabbed(true)
     my = 0
@@ -65,6 +71,15 @@ end
 
 function love.update(dt)
     debugStr = ""
+
+    if love.keyboard.isDown('f') and not oldFKey then
+        if fullscreen then fullscreen = false else fullscreen = true end
+        love.window.setFullscreen(fullscreen)
+    end
+
+    local fullscreenState = "false"
+    if fullscreen then fullscreenState = "true" end
+    debugStr = debugStr .. "\n Fullscreen: " .. fullscreenState 
 
     -- Free look
     if love.keyboard.isDown('lctrl') then
@@ -108,6 +123,8 @@ function love.update(dt)
 
     playerPos.z = playerPos.z + zVel
     if playerPos.z < -50 then gameSetup() end
+
+    oldFKey = love.keyboard.isDown('f')
 end
 
 function controls(dt)
@@ -248,25 +265,26 @@ function love.draw()
         allShperes[i]:draw()
     end
 
-    --[[for i = floor.len, 1, -1 do
-        if floor[i] == nil then debugStr = debugStr .. "\n nil index: " .. i
-        else
-            ground:setTranslation(floor[i].X, floor[i].Y, floor[i].Z)
-            ground:draw()
-        end
-    end--]]
-
     for X = 100, 1, -1 do
         for Y = 100, 1, -1 do
             local Z = getNoise(X, Y)
             if Z < noiseThreshold then
+                -- Lava
                 love.graphics.setColor(1, 1, 1)
                 lava:setTranslation((X * 2) + noiseSpawn.x, (Y * 2) + noiseSpawn.y, (Z * floorHeightDifference))
                 lava:draw()
                 love.graphics.setColor(0.5, 0.5, 0.5)
             else
-                ground:setTranslation((X * 2) + noiseSpawn.x, (Y * 2) + noiseSpawn.y, (Z * floorHeightDifference))
+                -- Stone
+                local current = {x = (X * 2) + noiseSpawn.x, y = (Y * 2) + noiseSpawn.y, z =  (Z * floorHeightDifference)}
+                ground:setTranslation(current.x, current.y, current.z)
+
+                -- lighting
+                local lightmag = Vector.magnitude(playerPos.x - current.x, playerPos.y - current.y, 0)
+                local light = 0.5 + (0.5 - (math.max(0, math.min(lightmag * 0.1, 0.5))))
+                love.graphics.setColor(light, light, light)
                 ground:draw()
+                love.graphics.setColor(0.5, 0.5, 0.5)
             end
 
             -- Place border
@@ -317,6 +335,13 @@ function getNoise(x, y)
     Z = Z + (love.math.noise((x + playerPos.x) * tempZoom + noiseOffset, (y + playerPos.y) * tempZoom + noiseOffset, timer * 2) * 0.5)
     tempZoom = zoom * 4
     Z = Z + (love.math.noise((x + playerPos.x) * tempZoom + noiseOffset, (y + playerPos.y) * tempZoom + noiseOffset, timer * 2) * 0.25)
+
+    -- Reverse, cursed
+    --[[local Z = love.math.noise((x - playerPos.x) * zoom + noiseOffset, (y - playerPos.y) * zoom + noiseOffset, timer * 2)
+    tempZoom = zoom * 2
+    Z = Z + (love.math.noise((x - playerPos.x) * tempZoom + noiseOffset, (y - playerPos.y) * tempZoom + noiseOffset, timer * 2) * 0.5)
+    tempZoom = zoom * 4
+    Z = Z + (love.math.noise((x - playerPos.x) * tempZoom + noiseOffset, (y - playerPos.y) * tempZoom + noiseOffset, timer * 2) * 0.25)]]--
 
     return Z
 end
