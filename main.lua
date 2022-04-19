@@ -136,13 +136,6 @@ function checkCubeCollision(dt)
             if mag < 5 then
                 current = { x = (d * 2) + noiseSpawn.x, y = (i * 2) + noiseSpawn.y, z = Z * floorHeightDifference }
 
-                -- ? what did you do here ?
-                --[[
-            if zVel > 0.5 then
-                ground:setTranslation((d * 2) + noiseSpawn.x, (i * 2) + noiseSpawn.y, (Z * floorHeightDifference) + zVel)
-            else]]
-                --end
-
                 local mag = {}
                 mag[1] = newPos[1] - current.x
                 mag[2] = newPos[2] - current.y
@@ -159,6 +152,18 @@ function checkCubeCollision(dt)
                 local ChangeIndex = 1
                 local PositiveOrNegative = 0
 
+                
+                ground:setTranslation(current.x, current.y, current.z)
+                if ground:closestPoint(playerPos.x, playerPos.y, playerPos.z) < 0.05 then
+                    if Z >= noiseThreshold then
+                        debugStr = debugStr .. "\n Rock"
+                    else
+                        debugStr = debugStr .. "\n Lava"
+                    end
+                end
+                
+
+
                 -- Check all sides on current cube
                 for j = 3, 1, -1 do
 
@@ -167,8 +172,13 @@ function checkCubeCollision(dt)
                     elseif j == 2 then n1, n2 = 1, -1
                     else n1, n2 = -1, -2 end
 
+                    
+                    
                     -- Check all three axis for the current side
                     if math.abs(mag[j]) < size and math.abs(mag[j + n1]) < size and math.abs(mag[j + n2]) < size then
+                    --if  ground:closestPoint(playerPos.x, playerPos.y, playerPos.z) <  then
+                        debugStr = debugStr .. "\n test: " .. ground:closestPoint(playerPos.x, playerPos.y, playerPos.z)
+                        
                         if Z >= noiseThreshold then
                             local pushForce = player.scale[1] + 1 - math.abs(mag[j])
                             newPos[j] = newPos[j] + ((newPos[j] - cubePos[j]) * pushForce)

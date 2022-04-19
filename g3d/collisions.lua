@@ -441,6 +441,28 @@ local function findAny(self, verts, func, ...)
     return false
 end
 
+function collisions.fuck(model, tip_x, tip_y, tip_z, base_x, base_y, base_z, radius)
+    -- the normal vector coming out the tip of the capsule
+    local norm_x, norm_y, norm_z = vectorNormalize(tip_x - base_x, tip_y - base_y, tip_z - base_z)
+
+    -- the base and tip, inset by the radius
+    -- these two coordinates are the actual extent of the capsule sphere line
+    local a_x, a_y, a_z = base_x + norm_x*radius, base_y + norm_y*radius, base_z + norm_z*radius
+    local b_x, b_y, b_z = tip_x - norm_x*radius, tip_y - norm_y*radius, tip_z - norm_z*radius
+
+    return findClosest(
+        model,
+        model.verts,
+        triangleCapsule,
+        tip_x, tip_y, tip_z,
+        base_x, base_y, base_z,
+        a_x, a_y, a_z,
+        b_x, b_y, b_z,
+        norm_x, norm_y, norm_z,
+        radius
+    )
+end
+
 ----------------------------------------------------------------------------------------------------
 -- collision functions that apply on lists of vertices
 ----------------------------------------------------------------------------------------------------
