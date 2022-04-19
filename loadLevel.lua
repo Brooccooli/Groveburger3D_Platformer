@@ -31,3 +31,27 @@ noiseThreshold = 0.9
 -- goal
 goalPos = {x = 0, y = 0, z = 0}
 goalIndex = love.math.random(1, 100 * 100)
+
+function gameSetup()
+    zVel = 0
+    playerPos = { x = 0, y = 0, z = 30 }
+    noiseOffset = love.math.random(1, 20)
+    noiseSpawn = { x = -100, y = -100 }
+    noiseThreshold = 0.9
+    goalIndex = love.math.random(1, 100 * 100)
+    timer = 0
+    local foundSpanw = false
+    while (true) do
+        for X = 100, 1, -1 do
+            for Y = 100, 1, -1 do
+                local Z = getNoise(X, Y)
+                if Z >= noiseThreshold then
+                    noiseSpawn.x, noiseSpawn.y = -(X * 2), -(Y * 2)
+                    if love.math.random(1, 10000) == 5 then
+                        return
+                    end
+                end
+            end
+        end
+    end
+end
